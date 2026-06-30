@@ -50,7 +50,7 @@ public class Coordinator {
                 // print("themeColor \(themeColor) for token \(TokenName(neonToken.name))")
 
                 if let themeFont = theme.font(forToken: TokenName(neonToken.name)) {
-                    attributes[.font] = themeFont
+                    attributes[.font] = themeFont.sized(like: textView.font)
                 }
             } else if let themeDefaultColor = theme.color(forToken: "plain") {
                 attributes[.foregroundColor] = themeDefaultColor
@@ -59,7 +59,7 @@ public class Coordinator {
                 // print("themeDefaultColor \(themeDefaultColor) for token \(TokenName(neonToken.name))")
 
                 if let themeFont = theme.font(forToken: TokenName(neonToken.name)) {
-                    attributes[.font] = themeFont
+                    attributes[.font] = themeFont.sized(like: textView.font)
                 }
             }
 
@@ -107,5 +107,16 @@ public class Coordinator {
             tsClient.didChangeContent(in: range, delta: delta, limit: limit, readHandler: readFunction, completionHandler: {})
         }
 
+    }
+}
+
+extension NSFont {
+    /// Returns this font at `base`'s point size, keeping its own weight and
+    /// traits. A theme supplies token fonts to carry styling like bold, but at
+    /// an arbitrary size. Resizing to the editor's font lets that styling track
+    /// the current font size instead of pinning tokens to a fixed size.
+    func sized(like base: NSFont?) -> NSFont {
+        guard let base, base.pointSize != pointSize else { return self }
+        return NSFont(descriptor: fontDescriptor, size: base.pointSize) ?? self
     }
 }
